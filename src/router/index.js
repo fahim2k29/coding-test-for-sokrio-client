@@ -48,6 +48,15 @@ const routes = [
         },
       },
 
+      {
+        path: "/purchase",
+        name: "app.purchase",
+        component: () => import("../views/Admin/Purchase/form.vue"),
+        meta: {
+          requiresAuth: true
+        },
+      },
+
     ],
   },
 

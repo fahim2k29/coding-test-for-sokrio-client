@@ -8,9 +8,8 @@
         </a>
       </header>
       <nav class="dashboard-nav-list">
-        <a href="#" class="dashboard-nav-item"><i class="fas fa-home"></i>Product</a>
-        <a href="#" class="dashboard-nav-item active"><i class="fas fa-tachometer-alt"></i> dashboard</a>
-        <a href="#" class="dashboard-nav-item"><i class="fas fa-file-upload"></i> Upload </a>
+        <router-link to="/product" class="dashboard-nav-item active"><i class="fas fa-home"></i>Product</router-link>
+        <router-link to="/purchase" class="dashboard-nav-item"><i class="fas fa-home"></i>Purchase </router-link>
         <div class="nav-item-divider"></div>
 
         <a href="#" role="button" class="dashboard-nav-item" @click="logout"><i class="fas fa-sign-out-alt"></i> Logout </a>

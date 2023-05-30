@@ -1,6 +1,5 @@
 <template>
     <div id="product">
-        <div class="col-12">
             <div class="card">
                 <div class="row card-header bg-transparent border-bottom">
                     <div class="col-md-8">
@@ -121,8 +120,8 @@
                 </div>
             </div>
             <!-- Create and Edit Modal -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl">
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" role="dialog" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Product Information</h5>
@@ -134,36 +133,46 @@
                                 <AlertError :form="form" message="There were some problems with your input." />
 
                                 <div class="modal-body row">
-                                    <div class="col-xl-12">
-                                        <div class="form-group my-2 col-xl-6">
+                                    <div class="">
+                                        <div class="form-group my-2 ">
                                             <label>Name</label>
                                             <input v-model="form.name" type="text" name="name" class="form-control" placeholder="Name" :readonly="showMode==true ? true : false">
                                             <HasError :form="form" field="name" />
                                         </div>
-                                        <div class="form-group my-2 col-xl-6">
+                                        <div class="form-group my-2">
                                             <label>Code</label>
-                                            <input v-model="form.code" type="text" nme="code" class="form-control" placeholder="Code" :readonly="showMode==true ? true : false">
+                                            <input v-model="form.code" type="text" name="code" class="form-control" placeholder="Code" :readonly="showMode==true ? true : false">
                                             <HasError :form="form" field="code" />
                                         </div>
-                                        <div class="form-group my-2 col-xl-6">
+                                        <div class="form-group my-2">
                                             <label>Price</label>
                                             <input v-model="form.price" type="text" name="price" class="form-control" placeholder="Price" :readonly="showMode==true ? true : false">
                                             <HasError :form="form" field="price" />
                                         </div>
-                                        <div class="form-group my-2 col-xl-6">
+                                        <div class="form-group my-2">
                                             <label>Quantity</label>
                                             <input v-model="form.quantity" type="text" name="quantity" class="form-control" placeholder="Quantity" :readonly="showMode==true ? true : false">
                                             <HasError :form="form" field="quantity" />
                                         </div>
-                                        <div class="form-group my-2 col-xl-6">
+                                        <div class="form-group my-2">
                                             <label>Unit</label>
                                             <input v-model="form.unit" type="text" name="unit" class="form-control" placeholder="Unit" :readonly="showMode==true ? true : false">
                                             <HasError :form="form" field="unit" />
                                         </div>
+                                        <div class="form-group my-2">
+                                            <label> Product Status</label>
+                                            <select v-if="showMode==false" class="form-control" name="status" v-model="form.status">
+                                                <option value="">Select One</option>
+                                                <option value="Active">Active</option>
+                                                <option value="Inactive">Inactive</option>
+                                            </select>
+                                            <input v-if="showMode==true" v-model="form.status" type="text" class="form-control" placeholder="Approval" :readonly="showMode==true ? true : false">
+                                            <HasError :form="form" field="status" />
+                                        </div>
 
                                     </div>
                                 </div>
-                                <div class="modal-footer">
+                                <div class="modal-footer" style="display: contents;">
                                     <button v-if="showMode==false" :disabled="form.busy" type="submit" class="btn btn-primary"> {{ editMode ? 'Update' : 'Create' }}</button>
                                 </div>
                             </form>
@@ -171,8 +180,6 @@
                     </div>
                 </div>
             </div>
-
-        </div>
 
         <notifications />
 
@@ -186,7 +193,7 @@
     import PaginationComponent from "../../../components/PaginationComponent.vue";
 
     export default {
-        name: 'CCCProductsTable',
+        name: 'Product',
         components: { PaginationComponent, Button, HasError, AlertError, AlertErrors, AlertSuccess },
 
         data() {
@@ -194,7 +201,7 @@
                 editMode: false,
                 showMode: false,
                 keyword: "",
-                fieldName: "title",
+                fieldName: "name",
                 perPage: 10,
                 products: [],
                 pagination: [],
@@ -203,11 +210,12 @@
 
                 form: new Form({
                     id: "",
-                    title: "",
-                    description: "",
-                    icon_class: "",
-                    resource_attachment:'',
-                    status: '',
+                    name: "",
+                    code: "",
+                    price: "",
+                    quantity: "",
+                    unit: "",
+                    status: "",
                 }),
 
             };
@@ -225,7 +233,7 @@
 
         methods: {
             getData(url) {
-                let linkUrl = url ? url :  `${this.backendUrl}resource`;
+                let linkUrl = url ? url :  `http://127.0.0.1:8000/api/product`;
                 axios.get(linkUrl, {
                     params: {
                         per_page: this.perPage,
@@ -245,6 +253,7 @@
             },
 
             create() {
+                console.log('çlicked')
                 this.editMode = false
                 this.showMode = false
                 this.form.reset()
@@ -266,23 +275,17 @@
                 this.form.reset()
                 this.form.clear()
                 this.form.fill(id)
-                this.newsFeedDocumentPreview = id.resource_attachment
                 $("#exampleModal").modal("show");
-            },
-
-            onImageChange(e){
-                this.form.image = e.target.files[0];
             },
 
             store() {
                 this.form.busy = true
-                this.form.post(`${this.backendUrl}resource`)
+                this.form.post(`http://127.0.0.1:8000/api/product`)
                     .then(response => {
                         this.getData()
                         $('#exampleModal').modal('hide')
                         if(this.form.successful){
-                            this.$notify({ type: "success", title: "Success", text: "Products Added" });
-                            this.newsFeedDocumentPreview = ''
+                            this.$notify({ type: "success", title: "Success", text: "Product Added Successfully" });
                         }else{
                             this.$notify({type: "error", title: "Error", text: 'Something went wrong try again later'})
                         }
@@ -294,7 +297,7 @@
 
             update() {
                 this.form.busy = true
-                this.form.put(`${this.backendUrl}resource/`+this.form.id)
+                this.form.put(`http://127.0.0.1:8000/api/product/`+this.form.id)
                     .then(response => {
                         this.getData()
                         $('#exampleModal').modal('hide')
@@ -321,7 +324,7 @@
                     confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        axios.delete(`${this.backendUrl}resource/`+id, )
+                        axios.delete(`http://127.0.0.1:8000/api/product/`+id, )
                             .then(response => {
                                 this.$swal.fire(
                                     'Deleted!',
